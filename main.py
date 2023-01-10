@@ -27,17 +27,34 @@ class Paddle:
 class Ball:
     def __init__(self,position:Vector): 
         self.position = position
-        self.velocity = Vector(random.randint(-20 ,20),random.randint(10 ,60))
+        self.velocity = Vector(random.randint(-20 ,20),random.randint(190,190))
 
     def draw(self):
         screen.draw.filled_circle((self.position.x, self.position.y), 5, 'green')
 
     def move(self, dt):
+        self.hit()
         self.position += self.velocity * dt
-    
-    
+
+    def hit(self):
+        if self.position.x <= 0 or self.position.x >= WIDTH:
+            self.velocity.x = -self.velocity.x
+            self.velocity.y = self.velocity.y + random.randint(-100,100)
+
+        if self.position.y <= 0:
+            self.velocity.y = -self.velocity.y
+            self.velocity.x = self.velocity.x + random.randint(-100,100)
+
+        if self.position.y + 5 > 390:
+            if paddle.position - W/2 -5 < self.position.x < paddle.position + W/2 + 5: 
+                self.velocity.y = -abs(self.velocity.y)
+                self.velocity.x = self.velocity.x + random.randint(-100,100)
 
 
+            
+
+
+        
 
 WIDTH = 600 # 600
 HEIGHT = 400 #800
