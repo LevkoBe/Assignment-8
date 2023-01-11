@@ -10,9 +10,7 @@ class Paddle:
         self.velocity = velocity
 
     def draw(self):
-        x = self.position
-        screen.draw.filled_rect(Rect(x, HEIGHT - H, W, H), (255, 153, 51))
-    
+        screen.draw.filled_rect(Rect(self.position, HEIGHT - H, W, H), "#08a704")
 
     def move(self, pos):
         p = pos[0] - W / 2
@@ -23,58 +21,58 @@ class Paddle:
             self.velocity = 0
 
 
-
 class Ball:
-    def __init__(self,position:Vector): 
+    def __init__(self, position: Vector):
         self.position = position
-        self.velocity = Vector(random.randint(-20 ,20),random.randint(190,190))
+        self.velocity = Vector(random.randint(-30, 30), VER_SPEED)
 
     def draw(self):
-        screen.draw.filled_circle((self.position.x, self.position.y), 5, 'green')
+        screen.draw.filled_circle((self.position.x, self.position.y), R, "#ff7c00")
 
     def move(self, dt):
         self.hit()
-        self.position += self.velocity * dt
+        if self.velocity.x > VER_SPEED:
+            self.velocity.x = VER_SPEED
+        self.position += self.velocity * dt * 10
 
     def hit(self):
-        if self.position.x <= 0 or self.position.x >= WIDTH:
-            self.velocity.x = -self.velocity.x
-            self.velocity.y = self.velocity.y + random.randint(-100,100)
 
-        if self.position.y <= 0:
-            self.velocity.y = -self.velocity.y
-            self.velocity.x = self.velocity.x + random.randint(-100,100)
+        if self.position.x <= R:
+            self.velocity.x = abs(self.velocity.x)
 
-        if self.position.y + 5 > 390:
-            if paddle.position - W/2 -5 < self.position.x < paddle.position + W/2 + 5: 
-                self.velocity.y = -abs(self.velocity.y)
-                self.velocity.x = self.velocity.x + random.randint(-100,100)
+        elif self.position.x >= WIDTH - R:
+            self.velocity.x = -abs(self.velocity.x)
+
+        if self.position.y <= R:
+            self.velocity.y = VER_SPEED
+
+        elif self.position.y >= HEIGHT - R:
+            self.velocity = Vector(0, 0)
+
+        if self.position.y >= 385 and paddle.position - R <= self.position.x <= paddle.position + W + R:
+            self.velocity.y = -VER_SPEED
+            self.velocity.x += paddle.velocity
 
 
-            
-
-
-        
-
-WIDTH = 600 # 600
-HEIGHT = 400 #800
-W = 100 # 200
-H =10 # 20
+WIDTH = 600  # 600
+HEIGHT = 400  # 800
+W = 100  # 200
+H = 10  # 20
+R = 7
+VER_SPEED = 30
 
 paddle = Paddle((WIDTH - W) / 2, 0)
-ball = Ball(Vector(WIDTH / 2, HEIGHT /2))
-
-
+ball = Ball(Vector(WIDTH / 2, HEIGHT / 2))
 
 ball.x = 3
 ball.y = 30
+
 
 def draw():
     screen.clear()
     screen.fill("#123456")
     paddle.draw()
     ball.draw()
-    
 
 
 def update(dt):
