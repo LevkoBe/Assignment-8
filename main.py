@@ -1,5 +1,6 @@
 import pgzrun
 import random
+from pgzero.actor import Actor
 
 from vector import Vector
 
@@ -53,6 +54,12 @@ class Ball:
             self.velocity.y = -VER_SPEED
             self.velocity.x += paddle.velocity
 
+class Heart:
+    def __init__(self, x):
+        self.actor = Actor("heart.png", center=(x, 20))
+        
+    def draw(self):
+        self.actor.draw()
 
 WIDTH = 600  # 600
 HEIGHT = 400  # 800
@@ -63,6 +70,9 @@ VER_SPEED = 30
 
 paddle = Paddle((WIDTH - W) / 2, 0)
 ball = Ball(Vector(WIDTH / 2, HEIGHT / 2))
+heart = Heart(20)
+heart1 = Heart(40)
+heart2 = Heart(60)
 
 ball.x = 3
 ball.y = 30
@@ -73,6 +83,9 @@ def draw():
     screen.fill("#123456")
     paddle.draw()
     ball.draw()
+    heart.draw()
+    heart1.draw()
+    heart2.draw()
 
 
 def update(dt):
