@@ -53,7 +53,6 @@ class Ball:
             if len(hearts) > 0:
                 hearts.remove(hearts[len(hearts) - 1])
             if len(hearts) == 0:
-                print("Game over!")
                 game_is_running = False
             self.position.y = HEIGHT - R - 1
 
@@ -70,6 +69,20 @@ class Heart:
         self.actor.draw()
 
 
+class Obstacle: 
+    def __init__(self, x, y, color):
+        self.position = Vector(x,y)
+        self.color = color
+
+    def draw(self):
+        screen.draw.filled_circle((self.position.x, self.position.y), R, self.color)
+        
+
+    def hit(self):
+        if (self.position - ball.position).magnitude() <= 2*R:
+            return True
+
+
 WIDTH = 600  # 600
 HEIGHT = 400  # 800
 W = 100  # 200
@@ -77,12 +90,20 @@ H = 10  # 20
 R = 7
 VER_SPEED = 30
 
+obstacles = []
+for a in range(57):
+    x = (a%19+1)*30
+    y = (a//19+1)*30
+    obstacles.append(Obstacle(x ,y, (0 , 255, 255)))
+
 paddle = Paddle((WIDTH - W) / 2, 0)
 ball = Ball(Vector(WIDTH / 2, HEIGHT / 2))
+
 hearts = []
 for x in range(3):
     hearts.append(Heart((x + 1) * 20))
 game_is_running = True
+
 
 ball.x = 3
 ball.y = 30
@@ -98,10 +119,16 @@ def draw():
     else:
         screen.draw.text(f"The game is over!", center=(300, 200), fontsize = 60, color=(255, 136, 0), shadow=(2,2))
     paddle.draw()
+    for obstacle in obstacles:
+        obstacle.draw()
 
 
 def update(dt):
     ball.move(dt)
+    for obstacle in obstacles:
+        if obstacle.hit():
+            obstacles.remove(obstacle)
+
 
 
 def on_mouse_move(pos):
