@@ -96,7 +96,7 @@ def draw():
         for heart in hearts:
             heart.draw()
     else:
-        screen.draw.text(f"The game is over!", (20, 20), color=(200, 200, 200))
+        screen.draw.text(f"The game is over!", center=(300, 200), fontsize = 60, color=(255, 136, 0), shadow=(2,2))
     paddle.draw()
 
 
