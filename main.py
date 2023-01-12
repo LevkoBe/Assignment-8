@@ -116,12 +116,11 @@ def draw():
         ball.draw()
         for heart in hearts:
             heart.draw()
+        for obstacle in obstacles:
+            obstacle.draw()
     else:
         screen.draw.text(f"The game is over!", center=(300, 200), fontsize = 60, color=(255, 136, 0), shadow=(2,2))
     paddle.draw()
-    for obstacle in obstacles:
-        obstacle.draw()
-
 
 def update(dt):
     ball.move(dt)
