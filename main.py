@@ -48,18 +48,27 @@ class Ball:
             self.velocity.y = VER_SPEED
 
         elif self.position.y >= HEIGHT - R:
+            global game_is_running
             self.velocity = Vector(0, 0)
+            if len(hearts) > 0:
+                hearts.remove(hearts[len(hearts) - 1])
+            if len(hearts) == 0:
+                print("Game over!")
+                game_is_running = False
+            self.position.y = HEIGHT - R - 1
 
         if self.position.y >= 385 and paddle.position - R <= self.position.x <= paddle.position + W + R:
             self.velocity.y = -VER_SPEED
             self.velocity.x += paddle.velocity
 
+
 class Heart:
     def __init__(self, x):
         self.actor = Actor("heart.png", center=(x, 20))
-        
+
     def draw(self):
         self.actor.draw()
+
 
 WIDTH = 600  # 600
 HEIGHT = 400  # 800
@@ -70,9 +79,10 @@ VER_SPEED = 30
 
 paddle = Paddle((WIDTH - W) / 2, 0)
 ball = Ball(Vector(WIDTH / 2, HEIGHT / 2))
-heart = Heart(20)
-heart1 = Heart(40)
-heart2 = Heart(60)
+hearts = []
+for x in range(3):
+    hearts.append(Heart((x + 1) * 20))
+game_is_running = True
 
 ball.x = 3
 ball.y = 30
@@ -81,11 +91,13 @@ ball.y = 30
 def draw():
     screen.clear()
     screen.fill("#123456")
+    if game_is_running:
+        ball.draw()
+        for heart in hearts:
+            heart.draw()
+    else:
+        screen.draw.text(f"The game is over!", (20, 20), color=(200, 200, 200))
     paddle.draw()
-    ball.draw()
-    heart.draw()
-    heart1.draw()
-    heart2.draw()
 
 
 def update(dt):
