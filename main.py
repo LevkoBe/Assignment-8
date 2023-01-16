@@ -107,6 +107,7 @@ class BonusLife:
             bonus_life = False
         if self.actor.y >= 400:
             bonus_life = False
+            self.actor.y = 0
 
 
 TEXT = 'The game is over'
@@ -167,7 +168,7 @@ def update(dt):
             if obstacle.hit():
                 ball.change_of_direction(obstacle)
                 obstacles.remove(obstacle)
-    if random.random() > 0.9 and not bonus_life:
+    if random.random() > 0.8 and not bonus_life:
         bonus_life = True
     else:
         bonuslife0.update()
