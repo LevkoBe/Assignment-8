@@ -60,6 +60,11 @@ class Ball:
             self.velocity.y = -VER_SPEED
             self.velocity.x += paddle.velocity
 
+    def change_of_direction(self, obstacle):
+        change_of_x = self.position.x - obstacle.position.x
+        change_of_y = self.position.y - obstacle.position.y
+        self.velocity = Vector(change_of_x, change_of_y).normalized() * 30
+
 
 class Heart:
     def __init__(self, x):
@@ -123,13 +128,25 @@ def draw():
 
 def update(dt):
     ball.move(dt)
-    for obstacle in obstacles:
-        if obstacle.hit():
-            obstacles.remove(obstacle)
+    if len(obstacles) == 0:
+        global game_is_running
+        screen.draw.text(f"You won!", center=(300, 200), fontsize=60, color=(255, 136, 200), shadow=(3, 2))
+        game_is_running = False
+    else:
+        for obstacle in obstacles:
+            if obstacle.hit():
+                ball.change_of_direction(obstacle)
+                obstacles.remove(obstacle)
 
 
 def on_mouse_move(pos):
     paddle.move(pos)
+
+
+def on_key_down(key):
+    if key == keys.MINUS:
+        if len(obstacles) != 0:
+            obstacles.remove(obstacles[len(obstacles) - 1])
 
 
 pgzrun.go()
