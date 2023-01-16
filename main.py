@@ -86,8 +86,25 @@ class Obstacle:
         if (self.position - ball.position).magnitude() <= 2 * R:
             return True
 
+class BonusLife:
+    def __init__(self):
+        self.position = Vector(random.randint(0, WIDTH),0)
+        self.actor = Actor("heart.png", center=(self.position.x, self.position.y))
 
+    def draw(self):
+        self.actor.draw()
 
+    def update(self):
+        self.actor.x = self.position.x
+        self.actor.y = self.position.y
+        self.position += Vector(0,1)
+
+        if self.position.y >= 385 and paddle.position <= self.position.x <= paddle.position + W:
+            self.position += Vector((len(hearts) + 1) * 20, 20)
+            #hearts.append(Heart((len(hearts) + 1) * 20))
+            hearts.append(self)
+
+       
 
 TEXT = 'The game is over'
 WIDTH = 600  # 600
@@ -114,6 +131,8 @@ game_is_running = True
 ball.x = 3
 ball.y = 30
 
+bonus_life = False
+bonuslife0 = BonusLife()
 
 def draw():
     screen.clear()
@@ -128,7 +147,12 @@ def draw():
         screen.draw.text(TEXT, center=(300, 200), fontsize=60, color=(255, 136, 0), shadow=(2, 2))
     paddle.draw()
 
+    if bonus_life:
+        bonuslife0.draw()
+
+
 def update(dt):
+    global bonus_life 
     ball.move(dt)
     if len(obstacles) == 0:
         global game_is_running, TEXT
@@ -139,6 +163,12 @@ def update(dt):
             if obstacle.hit():
                 ball.change_of_direction(obstacle)
                 obstacles.remove(obstacle)
+    if random.random() > 0.2 and not bonus_life:
+        bonus_life = True
+    else:
+        bonuslife0.update()
+
+    print(len(hearts))
 
 
 def on_mouse_move(pos):
@@ -149,6 +179,5 @@ def on_key_down(key):
     if key == keys.MINUS:
         if len(obstacles) != 0:
             obstacles.remove(obstacles[len(obstacles) - 1])
-
 
 pgzrun.go()
