@@ -75,9 +75,10 @@ class Heart:
 
 
 class Obstacle:
-    def __init__(self, x, y, color):
+    def __init__(self, x, y, level):
         self.position = Vector(x, y)
-        self.color = color
+        self.level = level
+        self.color = (85*level, 255, 80*level)
 
     def draw(self):
         screen.draw.filled_circle((self.position.x, self.position.y), R, self.color)
@@ -86,6 +87,14 @@ class Obstacle:
         if (self.position - ball.position).magnitude() <= 2 * R:
             return True
 
+    def change_level(self, obstacle):
+        if self.level >1:
+            self.level -=1
+            self.color = (85*self.level, 255, 80*self.level)
+        else:
+            obstacles.remove(obstacle)
+
+            
 
 class BonusLife:
     def __init__(self):
@@ -110,6 +119,8 @@ class BonusLife:
             self.actor.y = 0
 
 
+
+
 TEXT = 'The game is over'
 WIDTH = 600  # 600
 HEIGHT = 400  # 800
@@ -122,7 +133,7 @@ obstacles = []
 for a in range(57):
     x = (a % 19 + 1) * 30
     y = (a // 19 + 1) * 30
-    obstacles.append(Obstacle(x, y, (0, 255, 255)))
+    obstacles.append(Obstacle(x, y, random.randint(1,3)))
 
 paddle = Paddle((WIDTH - W) / 2, 0)
 ball = Ball(Vector(WIDTH / 2, HEIGHT / 2))
@@ -167,7 +178,7 @@ def update(dt):
         for obstacle in obstacles:
             if obstacle.hit():
                 ball.change_of_direction(obstacle)
-                obstacles.remove(obstacle)
+                obstacle.change_level(obstacle)
     if random.random() > 0.8 and not bonus_life:
         bonus_life = True
     else:
