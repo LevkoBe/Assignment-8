@@ -87,6 +87,9 @@ class Obstacle:
             return True
 
 
+
+
+TEXT = 'The game is over'
 WIDTH = 600  # 600
 HEIGHT = 400  # 800
 W = 100  # 200
@@ -122,15 +125,14 @@ def draw():
         for obstacle in obstacles:
             obstacle.draw()
     else:
-        screen.draw.text(f"The game is over!", center=(300, 200), fontsize=60, color=(255, 136, 0), shadow=(2, 2))
+        screen.draw.text(TEXT, center=(300, 200), fontsize=60, color=(255, 136, 0), shadow=(2, 2))
     paddle.draw()
-
 
 def update(dt):
     ball.move(dt)
     if len(obstacles) == 0:
-        global game_is_running
-        screen.draw.text(f"You won!", center=(300, 200), fontsize=60, color=(255, 136, 200), shadow=(3, 2))
+        global game_is_running, TEXT
+        TEXT = 'You win'
         game_is_running = False
     else:
         for obstacle in obstacles:
