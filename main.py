@@ -24,12 +24,13 @@ class Paddle:
     def change_size(self):
         global W
         W = 150
+        bonus = False
         clock.schedule_unique(self.reset_size, 15)
 
     def reset_size(self):
         global W, bonus
         W = 100
-        bonus = False
+        
 
 
 class Ball:
@@ -200,12 +201,16 @@ def draw():
             obstacle.draw()
         if bonus:
             s_bonus.draw()
+        if bonus_life:
+            bonuslife0.draw()
+
+        paddle.draw()
+        
     else:
         screen.draw.text(TEXT, center=(300, 200), fontsize=60, color=(255, 136, 0), shadow=(2, 2))
-    paddle.draw()
 
-    if bonus_life:
-        bonuslife0.draw()
+
+
 
 
 def update(dt):
