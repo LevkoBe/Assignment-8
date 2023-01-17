@@ -94,9 +94,42 @@ class Obstacle:
     def draw(self):
         screen.draw.filled_circle((self.position.x, self.position.y), R, self.color)
 
-    def hit(self):
+    def hit(self, obstacle):
         if (self.position - ball.position).magnitude() <= 2 * R:
-            return True
+            ball.change_of_direction(obstacle)
+            obstacle.change_level(obstacle)
+
+    def change_level(self, obstacle):
+        if self.level > 1:
+            self.level -= 1
+            self.color = (85 * self.level, 255, 80 * self.level)
+        else:
+            obstacles.remove(obstacle)
+
+
+class SquareObstacle:
+    def __init__(self, x, y, level):
+        self.position = Vector(x, y)
+        self.level = level
+        self.color = (85 * level, 80 * level, 255)
+
+    def draw(self):
+        screen.draw.filled_rect(Rect((self.position.x - R, self.position.y - R),
+                                     (2 * R, 2 * R)), self.color)
+
+    def hit(self, obstacle):
+        if self.position.x - 10 <= ball.x <= self.position.x + 10 and \
+                self.position.y - 10 - R <= ball.y <= self.position.y + 10 + R:
+            ball.velocity = Vector(ball.velocity.x, -ball.velocity.y)
+        elif self.position.y - 10 <= ball.y <= self.position.y + 10 and \
+                self.position.x - 10 - R <= ball.x <= self.position.x + 10 + R:
+            ball.velocity = Vector(-ball.velocity.x, ball.velocity.y)
+        elif (self.position - Vector(10, 10) - ball.position).magnitude() <= R or \
+                (self.position + Vector(10, -10) - ball.position).magnitude() <= R or \
+                (self.position + Vector(-10, 10) - ball.position).magnitude() <= R or \
+                (self.position + Vector(10, 10) - ball.position).magnitude() <= R:
+            ball.change_of_direction(obstacle)
+            self.change_level(obstacle)
 
     def change_level(self, obstacle):
         if self.level > 1:
@@ -167,19 +200,15 @@ H = 10  # 20
 R = 7
 VER_SPEED = 30
 
-obstacles = []
-for a in range(57):
-    x = (a % 19 + 1) * 30
-    y = (a // 19 + 1) * 30
-    obstacles.append(Obstacle(x, y, random.randint(1, 3)))
 
 paddle = Paddle((WIDTH - W) / 2, 0)
 ball = Ball(Vector(WIDTH / 2, HEIGHT / 2))
 
+obstacles = []
 hearts = []
 for x in range(3):
     hearts.append(Heart((x + 1) * 20))
-game_is_running = True
+game_is_running = False
 
 ball.x = 3
 ball.y = 30
@@ -188,6 +217,21 @@ bonus = False
 bonus_life = False
 bonuslife0 = BonusLife()
 s_bonus = SpecialBonus()
+
+
+def start_g(figure):
+    global obstacles, hearts
+    obstacles = []
+    hearts = []
+    for x in range(3):
+        hearts.append(Heart((x + 1) * 20))
+    for a in range(57):
+        x = (a % 19 + 1) * 30
+        y = (a // 19 + 1) * 30
+        if figure == "circle":
+            obstacles.append(Obstacle(x, y, random.randint(1, 3)))
+        else:
+            obstacles.append(SquareObstacle(x, y, random.randint(1, 3)))
 
 
 def draw():
@@ -203,28 +247,20 @@ def draw():
             s_bonus.draw()
         if bonus_life:
             bonuslife0.draw()
-
         paddle.draw()
-        
     else:
         screen.draw.text(TEXT, center=(300, 200), fontsize=60, color=(255, 136, 0), shadow=(2, 2))
 
 
-
-
-
 def update(dt):
-    global bonus_life, bonus
+    global bonus_life, bonus, game_is_running, TEXT
     ball.move(dt)
-    if len(obstacles) == 0:
-        global game_is_running, TEXT
+    if len(obstacles) == 0 and game_is_running:
         TEXT = 'You won'
         game_is_running = False
     else:
         for obstacle in obstacles:
-            if obstacle.hit():
-                ball.change_of_direction(obstacle)
-                obstacle.change_level(obstacle)
+            obstacle.hit(obstacle)
     if random.random() > 0.999 and not bonus_life:
         bonus_life = True
     else:
@@ -240,9 +276,16 @@ def on_mouse_move(pos):
 
 
 def on_key_down(key):
+    global game_is_running
     if key == keys.MINUS:
         if len(obstacles) != 0:
             obstacles.remove(obstacles[len(obstacles) - 1])
+    elif key == keys.K_1:
+        start_g("circle")
+        game_is_running = True
+    elif key == keys.K_2:
+        start_g("square")
+        game_is_running = True
 
 
 pgzrun.go()
