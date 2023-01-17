@@ -21,6 +21,16 @@ class Paddle:
         else:
             self.velocity = 0
 
+    def change_size(self):
+        global W
+        W = 150
+        clock.schedule_unique(self.reset_size, 15)
+
+    def reset_size(self):
+        global W, bonus
+        W = 100
+        bonus = False
+
 
 class Ball:
     def __init__(self, position: Vector):
@@ -78,7 +88,7 @@ class Obstacle:
     def __init__(self, x, y, level):
         self.position = Vector(x, y)
         self.level = level
-        self.color = (85*level, 255, 80*level)
+        self.color = (85 * level, 255, 80 * level)
 
     def draw(self):
         screen.draw.filled_circle((self.position.x, self.position.y), R, self.color)
@@ -88,13 +98,12 @@ class Obstacle:
             return True
 
     def change_level(self, obstacle):
-        if self.level >1:
-            self.level -=1
-            self.color = (85*self.level, 255, 80*self.level)
+        if self.level > 1:
+            self.level -= 1
+            self.color = (85 * self.level, 255, 80 * self.level)
         else:
             obstacles.remove(obstacle)
 
-            
 
 class BonusLife:
     def __init__(self):
@@ -116,9 +125,37 @@ class BonusLife:
             bonus_life = False
         if self.actor.y >= 400:
             bonus_life = False
+            self.actor.x = random.randint(0, WIDTH)
             self.actor.y = 0
 
 
+class SpecialBonus:
+    def __init__(self):
+        self.actor = Actor("bonus.png", center=(random.randint(0, WIDTH), 0))
+        self.x = 0
+
+    def draw(self):
+        self.actor.draw()
+
+    def update(self):
+        self.actor.y += 1
+        self.x += 1
+        if self.x == 100:
+            self.x = -100
+        if self.x != 0:
+            self.actor.x += self.x / abs(self.x)
+        self.hit()
+
+    def hit(self):
+        global bonus
+        if self.actor.y >= 385 and paddle.position <= self.actor.x <= paddle.position + W:
+            self.actor.x = random.randint(0, WIDTH)
+            self.actor.y = 0
+            paddle.change_size()
+        if self.actor.y >= 400:
+            self.actor.x = random.randint(0, WIDTH)
+            self.actor.y = 0
+            bonus = False
 
 
 TEXT = 'The game is over'
@@ -133,7 +170,7 @@ obstacles = []
 for a in range(57):
     x = (a % 19 + 1) * 30
     y = (a // 19 + 1) * 30
-    obstacles.append(Obstacle(x, y, random.randint(1,3)))
+    obstacles.append(Obstacle(x, y, random.randint(1, 3)))
 
 paddle = Paddle((WIDTH - W) / 2, 0)
 ball = Ball(Vector(WIDTH / 2, HEIGHT / 2))
@@ -146,8 +183,10 @@ game_is_running = True
 ball.x = 3
 ball.y = 30
 
+bonus = False
 bonus_life = False
 bonuslife0 = BonusLife()
+s_bonus = SpecialBonus()
 
 
 def draw():
@@ -159,6 +198,8 @@ def draw():
             heart.draw()
         for obstacle in obstacles:
             obstacle.draw()
+        if bonus:
+            s_bonus.draw()
     else:
         screen.draw.text(TEXT, center=(300, 200), fontsize=60, color=(255, 136, 0), shadow=(2, 2))
     paddle.draw()
@@ -168,7 +209,7 @@ def draw():
 
 
 def update(dt):
-    global bonus_life
+    global bonus_life, bonus
     ball.move(dt)
     if len(obstacles) == 0:
         global game_is_running, TEXT
@@ -179,10 +220,14 @@ def update(dt):
             if obstacle.hit():
                 ball.change_of_direction(obstacle)
                 obstacle.change_level(obstacle)
-    if random.random() > 0.8 and not bonus_life:
+    if random.random() > 0.999 and not bonus_life:
         bonus_life = True
     else:
         bonuslife0.update()
+    if random.random() > 0.999 and not bonus:
+        bonus = True
+    else:
+        s_bonus.update()
 
 
 def on_mouse_move(pos):
