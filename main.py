@@ -117,15 +117,17 @@ class SquareObstacle:
                                      (2 * R, 2 * R)), self.color)
 
     def hit(self, obstacle):
-        if self.position.x - R <= ball.x <= self.position.x + R and \
-                self.position.y - R - R <= ball.y <= self.position.y + R + R:
+        if self.position.x - R <= ball.position.x <= self.position.x + R and \
+                self.position.y - R - R <= ball.position.y <= self.position.y + R + R:
             ball.velocity = Vector(ball.velocity.x, -ball.velocity.y)
             self.change_level(obstacle)
-        elif self.position.y - R <= ball.y <= self.position.y + R and \
-                self.position.x - R - R <= ball.x <= self.position.x + R + R:
+        elif self.position.y - R <= ball.position.y <= self.position.y + R and \
+                self.position.x - R - R <= ball.position.x <= self.position.x + R + R:
             ball.velocity = Vector(-ball.velocity.x, ball.velocity.y)
             self.change_level(obstacle)
-        elif (self.position - ball.position).magnitude() <= 17:
+        elif (self.position - ball.position).magnitude() <= 17 and \
+                (self.position.x - R >= ball.position.x or ball.position.x >= self.position.x + R) and \
+                (self.position.y - R >= ball.position.y or ball.position.y >= self.position.y + R):
             ball.change_of_direction(obstacle)
             self.change_level(obstacle)
 
