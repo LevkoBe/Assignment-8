@@ -22,7 +22,7 @@ class Paddle:
             self.velocity = 0
 
     def change_size(self):
-        global W
+        global W, bonus
         W = 150
         bonus = False
         clock.schedule_unique(self.reset_size, 15)
@@ -30,7 +30,6 @@ class Paddle:
     def reset_size(self):
         global W, bonus
         W = 100
-        
 
 
 class Ball:
@@ -121,9 +120,11 @@ class SquareObstacle:
         if self.position.x - 10 <= ball.x <= self.position.x + 10 and \
                 self.position.y - 10 - R <= ball.y <= self.position.y + 10 + R:
             ball.velocity = Vector(ball.velocity.x, -ball.velocity.y)
+            self.change_level(obstacle)
         elif self.position.y - 10 <= ball.y <= self.position.y + 10 and \
                 self.position.x - 10 - R <= ball.x <= self.position.x + 10 + R:
             ball.velocity = Vector(-ball.velocity.x, ball.velocity.y)
+            self.change_level(obstacle)
         elif (self.position - Vector(10, 10) - ball.position).magnitude() <= R or \
                 (self.position + Vector(10, -10) - ball.position).magnitude() <= R or \
                 (self.position + Vector(-10, 10) - ball.position).magnitude() <= R or \
@@ -182,14 +183,14 @@ class SpecialBonus:
 
     def hit(self):
         global bonus
-        if self.actor.y >= 385 and paddle.position <= self.actor.x <= paddle.position + W:
-            self.actor.x = random.randint(0, WIDTH)
-            self.actor.y = 0
-            paddle.change_size()
         if self.actor.y >= 400:
             self.actor.x = random.randint(0, WIDTH)
             self.actor.y = 0
             bonus = False
+        elif self.actor.y >= 385 and paddle.position <= self.actor.x <= paddle.position + W:
+            self.actor.x = random.randint(0, WIDTH)
+            self.actor.y = 0
+            paddle.change_size()
 
 
 TEXT = 'The game is over'
@@ -199,7 +200,6 @@ W = 100  # 200
 H = 10  # 20
 R = 7
 VER_SPEED = 30
-
 
 paddle = Paddle((WIDTH - W) / 2, 0)
 ball = Ball(Vector(WIDTH / 2, HEIGHT / 2))
@@ -223,15 +223,15 @@ def start_g(figure):
     global obstacles, hearts
     obstacles = []
     hearts = []
-    for x in range(3):
-        hearts.append(Heart((x + 1) * 20))
+    for x_h in range(3):
+        hearts.append(Heart((x_h + 1) * 20))
     for a in range(57):
-        x = (a % 19 + 1) * 30
-        y = (a // 19 + 1) * 30
+        x_o = (a % 19 + 1) * 30
+        y_o = (a // 19 + 1) * 30
         if figure == "circle":
-            obstacles.append(Obstacle(x, y, random.randint(1, 3)))
+            obstacles.append(Obstacle(x_o, y_o, random.randint(1, 3)))
         else:
-            obstacles.append(SquareObstacle(x, y, random.randint(1, 3)))
+            obstacles.append(SquareObstacle(x_o, y_o, random.randint(1, 3)))
 
 
 def draw():
@@ -280,6 +280,10 @@ def on_key_down(key):
     if key == keys.MINUS:
         if len(obstacles) != 0:
             obstacles.remove(obstacles[len(obstacles) - 1])
+    if key == keys.DELETE:
+        for x in range(57):
+            if len(obstacles) != 3:
+                obstacles.remove(obstacles[len(obstacles) - 1])
     elif key == keys.K_1:
         start_g("circle")
         game_is_running = True
