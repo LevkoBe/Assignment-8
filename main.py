@@ -193,7 +193,7 @@ class SpecialBonus:
             paddle.change_size()
 
 
-TEXT = 'The game is over'
+TEXT = 'Choose level 1/2 '
 WIDTH = 600  # 600
 HEIGHT = 400  # 800
 W = 100  # 200
@@ -267,6 +267,8 @@ def update(dt):
         bonuslife0.update()
     if random.random() > 0.999 and not bonus:
         bonus = True
+    if len(hearts) == 0:
+        TEXT = 'The game is over'
     else:
         s_bonus.update()
 
