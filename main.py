@@ -28,7 +28,7 @@ class Paddle:
         clock.schedule_unique(self.reset_size, 15)
 
     def reset_size(self):
-        global W, bonus
+        global W
         W = 100
 
 
@@ -117,18 +117,15 @@ class SquareObstacle:
                                      (2 * R, 2 * R)), self.color)
 
     def hit(self, obstacle):
-        if self.position.x - 10 <= ball.x <= self.position.x + 10 and \
-                self.position.y - 10 - R <= ball.y <= self.position.y + 10 + R:
+        if self.position.x - R <= ball.x <= self.position.x + R and \
+                self.position.y - R - R <= ball.y <= self.position.y + R + R:
             ball.velocity = Vector(ball.velocity.x, -ball.velocity.y)
             self.change_level(obstacle)
-        elif self.position.y - 10 <= ball.y <= self.position.y + 10 and \
-                self.position.x - 10 - R <= ball.x <= self.position.x + 10 + R:
+        elif self.position.y - R <= ball.y <= self.position.y + R and \
+                self.position.x - R - R <= ball.x <= self.position.x + R + R:
             ball.velocity = Vector(-ball.velocity.x, ball.velocity.y)
             self.change_level(obstacle)
-        elif (self.position - Vector(10, 10) - ball.position).magnitude() <= R or \
-                (self.position + Vector(10, -10) - ball.position).magnitude() <= R or \
-                (self.position + Vector(-10, 10) - ball.position).magnitude() <= R or \
-                (self.position + Vector(10, 10) - ball.position).magnitude() <= R:
+        elif (self.position - ball.position).magnitude() <= 17:
             ball.change_of_direction(obstacle)
             self.change_level(obstacle)
 
@@ -215,7 +212,7 @@ ball.y = 30
 
 bonus = False
 bonus_life = False
-bonuslife0 = BonusLife()
+bonus_life_0 = BonusLife()
 s_bonus = SpecialBonus()
 
 
@@ -246,7 +243,7 @@ def draw():
         if bonus:
             s_bonus.draw()
         if bonus_life:
-            bonuslife0.draw()
+            bonus_life_0.draw()
         paddle.draw()
     else:
         screen.draw.text(TEXT, center=(300, 200), fontsize=60, color=(255, 136, 0), shadow=(2, 2))
@@ -264,7 +261,7 @@ def update(dt):
     if random.random() > 0.999 and not bonus_life:
         bonus_life = True
     else:
-        bonuslife0.update()
+        bonus_life_0.update()
     if random.random() > 0.999 and not bonus:
         bonus = True
     if len(hearts) == 0:
