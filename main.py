@@ -165,7 +165,7 @@ class BonusLife:
 
 class SpecialBonus:
     def __init__(self):
-        self.actor = Actor("bonus.png", center=(random.randint(0, WIDTH), 0))
+        self.actor = Actor("bonus.png", center=(random.randint(100, WIDTH - 100), 0))
         self.x = 0
 
     def draw(self):
@@ -183,11 +183,11 @@ class SpecialBonus:
     def hit(self):
         global bonus
         if self.actor.y >= 400:
-            self.actor.x = random.randint(0, WIDTH)
+            self.actor.x = random.randint(100, WIDTH - 100)
             self.actor.y = 0
             bonus = False
         elif self.actor.y >= 385 and paddle.position <= self.actor.x <= paddle.position + W:
-            self.actor.x = random.randint(0, WIDTH)
+            self.actor.x = random.randint(100, WIDTH - 100)
             self.actor.y = 0
             paddle.change_size()
 
@@ -244,8 +244,10 @@ def draw():
             obstacle.draw()
         if bonus:
             s_bonus.draw()
+            s_bonus.update()
         if bonus_life:
             bonus_life_0.draw()
+            bonus_life_0.update()
         paddle.draw()
     else:
         screen.draw.text(TEXT, center=(300, 200), fontsize=60, color=(255, 136, 0), shadow=(2, 2))
@@ -262,14 +264,10 @@ def update(dt):
             obstacle.hit(obstacle)
     if random.random() > 0.999 and not bonus_life:
         bonus_life = True
-    else:
-        bonus_life_0.update()
     if random.random() > 0.999 and not bonus:
         bonus = True
     if len(hearts) == 0:
         TEXT = 'The game is over'
-    else:
-        s_bonus.update()
 
 
 def on_mouse_move(pos):
